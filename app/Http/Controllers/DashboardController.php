@@ -4,84 +4,96 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\Student;
+use App\Models\Portfolio;
+use App\Models\Skill;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        
+        // Get student profile (or create if not exists)
+        $student = Student::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'nim' => 'TEMP-' . $user->id,
+                'full_name' => $user->name,
+                'email' => $user->email,
+            ]
+        );
+
         // Welcome message data
-        $userName = auth()->user()->name ?? 'User';
-        $progressPercentage = 70;
+        $userName = $user->name;
+        $totalPortfolios = $student->portfolios()->count();
+        $approvedPortfolios = $student->portfolios()->where('status', 'approved')->count();
+        
+        // Calculate progress percentage
+        $progressPercentage = $totalPortfolios > 0 
+            ? round(($approvedPortfolios / $totalPortfolios) * 100) 
+            : 0;
 
         // Current month for calendar
         $currentMonth = Carbon::now()->format('F Y');
 
-        // Generate calendar days
-        $calendarDays = $this->generateCalendarDays();
+        // Generate calendar days with portfolio dates
+        $portfolioDates = $student->portfolios()
+            ->whereYear('created_at', Carbon::now()->year)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->pluck('created_at')
+            ->map(fn($date) => Carbon::parse($date)->day)
+            ->unique()
+            ->toArray();
+        
+        $calendarDays = $this->generateCalendarDays($portfolioDates);
 
-        // Sample certificates data
-        $certificates = [
-            [
-                'name' => 'Mayowa Ade',
-                'initials' => 'MA',
-                'color' => 'orange',
-                'message' => 'Hey! I just finished the first chapter',
-                'attachments' => ['First Chapter of Project .doc'],
-                'time' => '09:34 am'
-            ],
-            [
-                'name' => 'Olawuyi Tobi',
-                'initials' => 'OT',
-                'color' => 'pink',
-                'message' => 'Can you check out the formulas in these Images att...',
-                'attachments' => ['Image .jpg', 'Form .jpg', 'Image 2 .jpg'],
-                'time' => '12:30 pm'
-            ],
-            [
-                'name' => 'Joshua Ashiru',
-                'initials' => 'JA',
-                'color' => 'green',
-                'message' => 'Dear Ayo, You are yet to submit your assignment for chapt...',
-                'attachments' => [],
-                'time' => '15:30 pm'
-            ],
-        ];
+        // Get recent portfolios (acting as certificates/messages)
+        $certificates = $student->portfolios()
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function($portfolio) {
+                $initials = collect(explode(' ', $portfolio->title))
+                    ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                    ->take(2)
+                    ->join('');
+                
+                return [
+                    'name' => $portfolio->category_name,
+                    'initials' => $initials,
+                    'color' => $portfolio->status_color,
+                    'message' => $portfolio->title,
+                    'description' => $portfolio->description,
+                    'attachments' => [$portfolio->file_path],
+                    'time' => $portfolio->created_at->format('h:i A'),
+                    'status' => $portfolio->status,
+                ];
+            });
 
-        // Upcoming activities
-        $upcomingActivities = [
-            [
-                'day' => '8',
-                'color' => 'blue',
-                'title' => 'Life Contingency Tutorials',
-                'date' => '8th - 10th July 2021',
-                'time' => '8 A.M - 9 A.M',
-                'location' => 'Edulog Tutorial College, Blk 56, Lagos State.'
-            ],
-            [
-                'day' => '13',
-                'color' => 'pink',
-                'title' => 'Social Insurance Test',
-                'date' => '13th July 2021',
-                'time' => '8 A.M - 9 A.M',
-                'location' => 'School Hall, University Road, Lagos State'
-            ],
-            [
-                'day' => '18',
-                'color' => 'green',
-                'title' => 'Adv. Maths Assignment Due',
-                'date' => '18th July 2021',
-                'time' => '8 A.M - 9 A.M',
-                'location' => '**To be submitted via Email'
-            ],
-            [
-                'day' => '23',
-                'color' => 'orange',
-                'title' => 'Dr. Dipo\'s Tutorial Class',
-                'date' => '23rd July 2021',
-                'time' => '10 A.M - 1 P.M',
-                'location' => 'Edulog Tutorial College, Blk 56, Lagos State.'
-            ],
-        ];
+        // Get upcoming/pending portfolios
+        $upcomingActivities = $student->portfolios()
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->limit(4)
+            ->get()
+            ->map(function($portfolio) {
+                return [
+                    'day' => $portfolio->created_at->format('d'),
+                    'color' => 'yellow',
+                    'title' => $portfolio->title,
+                    'date' => $portfolio->created_at->format('jS F Y'),
+                    'time' => 'Pending Review',
+                    'location' => $portfolio->category_name,
+                    'category' => $portfolio->category,
+                ];
+            });
+
+        // Chart data: Portfolio submissions over time (last 4 months)
+        $chartData = $this->getPortfolioChartData($student);
+
+        // Skills data for second chart
+        $skillsData = $this->getSkillsChartData($student);
 
         return view('dashboard', compact(
             'userName',
@@ -89,11 +101,16 @@ class DashboardController extends Controller
             'currentMonth',
             'calendarDays',
             'certificates',
-            'upcomingActivities'
+            'upcomingActivities',
+            'chartData',
+            'skillsData',
+            'totalPortfolios',
+            'approvedPortfolios',
+            'student'
         ));
     }
 
-    private function generateCalendarDays()
+    private function generateCalendarDays($portfolioDates = [])
     {
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
@@ -112,25 +129,54 @@ class DashboardController extends Controller
         // Add all days of the month
         for ($day = 1; $day <= $endOfMonth->day; $day++) {
             $isToday = ($day == $now->day);
-            
-            // Mark specific days with activities (matching the image)
-            $hasActivity = in_array($day, [8, 13, 18, 23]);
-            $activityColor = match($day) {
-                8 => 'blue',
-                13 => 'pink',
-                18 => 'green',
-                23 => 'orange',
-                default => ''
-            };
+            $hasActivity = in_array($day, $portfolioDates);
             
             $days[] = [
                 'date' => $day,
                 'isToday' => $isToday,
                 'hasActivity' => $hasActivity,
-                'activityColor' => $activityColor
+                'activityColor' => $hasActivity ? 'green' : ''
             ];
         }
         
         return $days;
+    }
+
+    private function getPortfolioChartData($student)
+    {
+        // Get last 4 months of portfolio submissions
+        $months = collect();
+        for ($i = 3; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $count = $student->portfolios()
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+            
+            $months->push([
+                'label' => $date->format('M'),
+                'count' => $count,
+            ]);
+        }
+
+        return $months;
+    }
+
+    private function getSkillsChartData($student)
+    {
+        // Get student's skills vs total available skills
+        $studentSkillsCount = $student->skills()->count();
+        $totalSkillsCount = Skill::count();
+        
+        // Create dummy progression data for visualization
+        $progression = collect([1, 2, 3, 4])->map(function($month) use ($studentSkillsCount) {
+            return max(1, $studentSkillsCount - (4 - $month));
+        });
+
+        return [
+            'current' => $studentSkillsCount,
+            'total' => max($totalSkillsCount, 10), // Ensure at least 10 for good visualization
+            'progression' => $progression,
+        ];
     }
 }
