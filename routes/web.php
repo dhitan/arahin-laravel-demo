@@ -32,3 +32,10 @@ Route::get('/portfolio/{id}', [PortfolioController::class, 'show'])->name('portf
 require __DIR__.'/auth.php';
 
 
+Route::get('/cek-php', function () {
+    return [
+        'File Config yang Dipakai' => php_ini_loaded_file(),
+        'Batas Upload (upload_max_filesize)' => ini_get('upload_max_filesize'),
+        'Batas Post (post_max_size)' => ini_get('post_max_size'),
+    ];
+});
