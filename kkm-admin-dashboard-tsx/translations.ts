@@ -99,7 +99,18 @@ export const translations = {
     job_type: "Tipe Pekerjaan",
     job_status: "Status Lowongan",
     description: "Deskripsi",
-    save_job: "Simpan Lowongan"
+    save_job: "Simpan Lowongan",
+    // Stats Page
+    stats_title: "Laporan Statistik",
+    stats_subtitle: "Analisis data lowongan dan pelamar.",
+    stats_total_jobs: "Total Lowongan",
+    stats_total_applicants: "Total Pelamar",
+    stats_avg_applicants: "Rata-rata Pelamar",
+    stats_industry_chart: "Permintaan Tenaga Kerja per Industri",
+    stats_type_chart: "Distribusi Tipe Pekerjaan",
+    stats_location_chart: "Sebaran Lokasi Pekerjaan",
+    stats_people: "Orang",
+    stats_jobs: "Pekerjaan"
   },
   en: {
     dashboard: "Dashboard",
@@ -200,7 +211,18 @@ export const translations = {
     job_type: "Job Type",
     job_status: "Job Status",
     description: "Description",
-    save_job: "Save Job"
+    save_job: "Save Job",
+    // Stats Page
+    stats_title: "Statistical Reports",
+    stats_subtitle: "Analyze job vacancies and applicant data.",
+    stats_total_jobs: "Total Jobs",
+    stats_total_applicants: "Total Applicants",
+    stats_avg_applicants: "Avg Applicants",
+    stats_industry_chart: "Labor Demand by Industry",
+    stats_type_chart: "Job Type Distribution",
+    stats_location_chart: "Job Location Distribution",
+    stats_people: "People",
+    stats_jobs: "Jobs"
   }
 };
 

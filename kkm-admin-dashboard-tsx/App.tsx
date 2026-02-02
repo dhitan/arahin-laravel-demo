@@ -9,6 +9,7 @@ import VerificationPage from './components/VerificationPage';
 import ProfilePage from './components/ProfilePage';
 import StudentsPage from './components/StudentsPage';
 import JobsPage from './components/JobsPage';
+import StatsPage from './components/StatsPage';
 import { INITIAL_VERIFICATIONS, INITIAL_STUDENTS, INITIAL_JOBS } from './constants';
 import { StudentVerification, Student, Job } from './types';
 import { translations, Language } from './translations';
@@ -273,7 +274,14 @@ const App: React.FC = () => {
               />
             )}
 
-            {currentView !== 'dashboard' && currentView !== 'verification' && currentView !== 'profile' && currentView !== 'students' && currentView !== 'jobs' && (
+            {currentView === 'stats' && (
+              <StatsPage 
+                jobs={jobs}
+                lang={lang}
+              />
+            )}
+
+            {currentView !== 'dashboard' && currentView !== 'verification' && currentView !== 'profile' && currentView !== 'students' && currentView !== 'jobs' && currentView !== 'stats' && (
               <div className="py-20 text-center space-y-4">
                 <span className="material-icons-outlined text-6xl text-slate-200 dark:text-slate-800">construction</span>
                 <h2 className="text-xl font-bold dark:text-white">Halaman "{currentView}" sedang dalam pengembangan</h2>
