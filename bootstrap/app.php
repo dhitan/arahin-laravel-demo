@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             // Middleware Bahasa yang baru kita buat
             \App\Http\Middleware\Localization::class,
+            \App\Http\Middleware\UpdateUserLastSeen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
