@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 ml-0 md:ml-64 transition-all duration-300">
+<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 w-full transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             
@@ -11,11 +11,17 @@
                 </button>
             </div>
 
-            <div class="flex-1"></div>
+            <div class="flex shrink-0 items-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                    <img src="{{ asset('favicon.png') }}" alt="Logo" class="w-8 h-8">
+                    <span class="font-bold text-xl text-gray-800 dark:text-white hidden sm:block">Arahin<span class="text-blue-600">.id</span></span>
+                </a>
+            </div>
 
             <div class="flex items-center sm:ms-6">
                 
-                <button id="theme-toggle" type="button" class="mr-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                {{-- Theme Toggle --}}
+                <button id="theme-toggle" type="button" class="mr-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 transition-colors">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
                     </svg>
@@ -28,15 +34,14 @@
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                             
-                            {{-- Mulai Kode Foto Profil --}}
+                            {{-- Foto Profil --}}
                             @if(Auth::user()->avatar)
                                 <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200">
                             @else
-                                <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-2 text-gray-600 dark:text-gray-300 font-bold border border-gray-300 dark:border-gray-600">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-2 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
                             @endif
-                            {{-- Selesai Kode Foto Profil --}}
 
                             <div class="hidden sm:block dark:text-gray-400">{{ Auth::user()->name }}</div>
 
@@ -65,17 +70,27 @@
         </div>
     </div>
 
+    {{-- Mobile Menu --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            </div>
+        </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            <div class="px-4 flex items-center gap-3">
+                @if(Auth::user()->avatar)
+                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                @else
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                @endif
+                <div>
+                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
@@ -95,14 +110,12 @@
 
     @push('scripts')
     <script>
-    // Theme toggle functionality (Script Asli Kamu)
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
     const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-    // Check for saved theme preference or default to light mode
+    // Init Theme
     const currentTheme = localStorage.getItem('theme') || 'light';
-
     if (currentTheme === 'dark') {
         document.documentElement.classList.add('dark');
         themeToggleLightIcon?.classList.remove('hidden');
@@ -111,7 +124,7 @@
         themeToggleDarkIcon?.classList.remove('hidden');
     }
 
-    // Toggle theme on button click
+    // Toggle Theme (Tanpa Reload Page agar lebih smooth)
     themeToggleBtn?.addEventListener('click', function() {
         themeToggleDarkIcon.classList.toggle('hidden');
         themeToggleLightIcon.classList.toggle('hidden');
@@ -119,11 +132,9 @@
         if (document.documentElement.classList.contains('dark')) {
             document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', 'light');
-            location.reload();
         } else {
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
-            location.reload();
         }
     });
     </script>

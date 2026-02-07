@@ -12,15 +12,12 @@ use App\Http\Controllers\VerificationController;
 |--------------------------------------------------------------------------
 */
 
-// --- SWITCH LANGUAGE ROUTE (FITUR BARU) ---
-// Route ini menghandle pergantian bahasa (ID <-> EN)
-// Ditaruh di luar middleware auth agar bisa diakses di halaman login/welcome
+// --- SWITCH LANGUAGE ROUTE ---
 Route::get('lang/{locale}', function ($locale) {
-    // Validasi input hanya boleh 'en' atau 'id'
     if (in_array($locale, ['en', 'id'])) {
-        session(['locale' => $locale]); // Simpan pilihan ke session
+        session(['locale' => $locale]);
     }
-    return redirect()->back(); // Kembali ke halaman sebelumnya
+    return redirect()->back();
 })->name('lang.switch');
 
 
@@ -28,7 +25,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route Debugging (Bisa dihapus nanti saat production)
+// Route Debugging
 Route::get('/cek-php', function () {
     return [
         'File Config yang Dipakai' => php_ini_loaded_file(),
@@ -40,17 +37,14 @@ Route::get('/cek-php', function () {
 // Group Route untuk User yang sudah Login & Terverifikasi Email
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // --- 1. DASHBOARD UMUM / MAHASISWA (URL: /dashboard) ---
-    // Route default yang dicari Laravel secara standar setelah login
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // 👇 PERUBAHAN DI SINI (Dulu 'dashboard', sekarang 'home')
+    // URL: /home, Name: home
+    Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
-    // --- PROFILE (URL diubah jadi /admin/profile) ---
+    // --- PROFILE ---
     Route::get('/admin/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
-    // 👇 ROUTE BARU: UPDATE AVATAR/FOTO PROFIL
     Route::patch('/admin/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
-    
     Route::delete('/admin/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // --- STUDENT PORTFOLIOS (Mahasiswa) ---
@@ -58,29 +52,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/portfolios/create', [PortfolioController::class, 'create'])->name('portfolio.create');
     Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolio.store');
     
-    // Detail Portfolio (Digunakan juga untuk Modal di Dashboard / Admin Preview)
+    // Detail Portfolio
     Route::get('/portfolio/{id}', [PortfolioController::class, 'show'])->name('portfolio.show');
 
+    // --- COURSES (Placeholder) ---
+    Route::get('/courses', function () {
+        return "Halaman Course Belum Tersedia (Coming Soon)";
+    })->name('courses.index');
+
     // --- ADMIN AREA ---
-    // Semua route di dalam group ini akan otomatis diawali URL "/admin"
     Route::prefix('admin')->group(function () {
         
-        // 2. DASHBOARD KHUSUS ADMIN (URL: /admin/dashboard)
-        // Kita arahkan ke controller yang sama, tapi nama route-nya 'admin.dashboard'
-        // Ini penting agar Sidebar bisa membedakan mana dashboard admin & mahasiswa
+        // 2. DASHBOARD KHUSUS ADMIN (Tetap /admin/dashboard)
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        // URL: /admin/verification
-        // Nama Route otomatis: verification.index, verification.show, verification.update
+        // Verification Resource
         Route::resource('verification', VerificationController::class)
             ->only(['index', 'show', 'update']);
 
-        // --- HALAMAN CMS (MANAJEMEN ADMIN) ---
-        // Route untuk menampilkan halaman list admin & modal tambah admin
+        // --- HALAMAN CMS ---
         Route::get('/cms', [DashboardController::class, 'cms'])->name('cms.index');
 
-        // --- TAMBAH ADMIN BARU (INTERNAL DASHBOARD) ---
-        // Route ini menangani pembuatan admin baru oleh admin yang sedang login
+        // --- TAMBAH ADMIN BARU ---
         Route::post('/create-admin', [DashboardController::class, 'storeAdmin'])->name('admin.create');
     });
 

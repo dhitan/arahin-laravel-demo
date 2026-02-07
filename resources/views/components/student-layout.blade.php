@@ -2,7 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
       x-data="{ 
           darkMode: localStorage.getItem('theme') === 'dark',
-          sidebarOpen: false,
           toggleTheme() {
               this.darkMode = !this.darkMode;
               localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
@@ -23,7 +22,7 @@
 
     <title>{{ config('app.name', 'Arahin.id') }}</title>
 
-    {{-- Favicon (DITAMBAHKAN) --}}
+    {{-- Favicon --}}
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
     {{-- 1. FONT & ICONS --}}
@@ -31,7 +30,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-    {{-- 2. VITE (Opsional, jika kamu pakai build process) --}}
+    {{-- 2. VITE --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     {{-- 3. TAILWIND CSS (CDN) --}}
@@ -53,19 +52,15 @@
         }
     </script>
 
-    {{-- 4. CUSTOM STYLES (Untuk Animasi Halaman Profile) --}}
+    {{-- 4. CUSTOM STYLES --}}
     <style>
-        /* Animasi Fade In & Slide */
         .animate-in { animation: fadeIn 0.5s ease-out forwards; }
         .fade-in { opacity: 0; }
-        .slide-in-from-right-4 { transform: translateX(1rem); }
-        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Scrollbar Halus */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -78,28 +73,27 @@
 </head>
 <body class="font-sans antialiased bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
     
-    <div class="flex h-screen overflow-hidden">
+    {{-- LAYOUT WRAPPER (Vertical, No Sidebar) --}}
+    <div class="min-h-screen flex flex-col">
         
-        {{-- SIDEBAR --}}
-        {{-- Pastikan file ini ada di resources/views/components/sidebar.blade.php --}}
-        @include('components.sidebar')
+        {{-- 1. NAVBAR ATAS --}}
+        {{-- Menggunakan navigasi standar (Top Navigation) --}}
+        @include('layouts.navigation')
 
-        {{-- MAIN CONTENT AREA --}}
-        <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            
-            {{-- HEADER (Topbar) --}}
-            {{-- Pastikan file ini ada di resources/views/components/header.blade.php --}}
-            {{-- Jika belum ada, kamu bisa membuat file kosong dulu atau hapus baris ini sementara --}}
-            @if(view()->exists('components.header'))
-                @include('components.header')
-            @endif
+        {{-- 2. MAIN CONTENT --}}
+        <main class="flex-1 w-full max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 fade-in animate-in">
+            {{ $slot }}
+        </main>
 
-            {{-- CONTENT SLOT --}}
-            <main class="w-full grow p-6">
-                {{ $slot }}
-            </main>
-            
-        </div>
+        {{-- 3. FOOTER --}}
+        <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 mt-auto">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                    &copy; {{ date('Y') }} Arahin.id Project. All rights reserved.
+                </p>
+            </div>
+        </footer>
+
     </div>
 
     @stack('scripts')

@@ -14,24 +14,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Panggil Seeder Course (Agar data course muncul untuk rekomendasi)
+        $this->call(CourseSeeder::class);
+
         // 1. GENESIS ADMIN (Akun Dewa/Utama)
         // Ini adalah admin pertama yang dibuat lewat kodingan.
-        // Admin selanjutnya nanti dibuat lewat menu di Dashboard Admin.
         User::create([
             'name' => 'Super Admin',
-            'email' => 'admin@kkm.com',
-            'password' => Hash::make('password'), // Password default, ganti nanti!
+            'email' => 'admin@arahin.id', // Sesuaikan dengan brand baru
+            'password' => Hash::make('password'),
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
 
-        // 2. AKUN MAHASISWA DUMMY (Untuk Testing)
+        // 2. AKUN MAHASISWA DUMMY (Untuk Testing Rekomendasi)
         $mhs = User::create([
             'name' => 'Ghufroon Mahasiswa',
-            'email' => 'mhs@kkm.com',
+            'email' => 'ghufroon@student.com', // Email untuk login
             'password' => Hash::make('password'),
             'role' => 'mahasiswa',
             'email_verified_at' => now(),
+            
+            // 👇 PENTING: Kita set minatnya 'Web Development'
+            // Agar sistem bisa mencocokkan dengan course kategori 'Web Development'
+            'interest' => 'Web Development', 
         ]);
 
         // Penting: Buat data detail di tabel 'students' agar dashboard tidak error

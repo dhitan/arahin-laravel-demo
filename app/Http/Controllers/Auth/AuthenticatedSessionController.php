@@ -35,8 +35,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
-        // Jika Mahasiswa (default), arahkan ke dashboard biasa
-        return redirect()->intended(route('dashboard', absolute: false));
+        // 👇 PERUBAHAN DI SINI:
+        // Jika Mahasiswa (default), arahkan ke '/home' (route name: 'home')
+        return redirect()->intended(route('home', absolute: false));
     }
 
     /**

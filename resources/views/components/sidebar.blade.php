@@ -13,11 +13,18 @@
 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
        class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 ease-in-out md:static md:translate-x-0 flex flex-col h-screen flex-shrink-0">
     
-    <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
-        <div class="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xl cursor-pointer">
-            <span class="material-icons-outlined text-yellow-500 dark:text-yellow-400">school</span>
-            <span>KKM APP</span>
+    {{-- Header Sidebar (Logo) --}}
+    <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
+        {{-- Logo Arahin.id --}}
+        <div class="flex items-center gap-3 cursor-pointer">
+            {{-- LOGO IMAGE (Menggantikan Icon FontAwesome) --}}
+            <img src="{{ asset('favicon.png') }}" alt="Logo" class="w-9 h-9 object-contain">
+            
+            <span class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                Arahin<span class="text-blue-500">.id</span>
+            </span>
         </div>
+        
         <button @click="sidebarOpen = false" class="md:hidden ml-auto text-slate-500 hover:text-slate-700 dark:text-slate-400">
             <span class="material-icons-outlined">close</span>
         </button>
@@ -85,7 +92,6 @@
                 $isActive = request()->routeIs($checkPattern);
                 
                 // Safety Check: Pastikan route ada sebelum dipanggil biar gak error 
-                // (Berguna jika temanmu belum selesai bikin route Mahasiswa/Lowongan)
                 $url = Route::has($menu['route']) ? route($menu['route']) : '#';
             @endphp
             

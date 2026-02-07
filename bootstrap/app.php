@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+// 👇 1. JANGAN LUPA IMPORT BARIS INI
+use App\Http\Middleware\HandleInertiaRequests; 
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,9 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // 👇 2. TAMBAHKAN KODE INI DI SINI
         $middleware->web(append: [
-            // Middleware Bahasa yang baru kita buat
-            \App\Http\Middleware\Localization::class,
+            HandleInertiaRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
