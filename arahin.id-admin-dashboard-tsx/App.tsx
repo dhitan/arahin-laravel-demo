@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [lang, setLang] = useState<Language>('id');
   const [currentView, setCurrentView] = useState('dashboard');
-  
+
   // Specific state to handle navigation to a specific verification detail
   const [selectedVerificationId, setSelectedVerificationId] = useState<string | null>(null);
 
@@ -75,13 +75,13 @@ const App: React.FC = () => {
   }, [lang]);
 
   const handleApprove = useCallback((id: string, feedback: string = '') => {
-    setVerifications(prev => prev.map(v => 
+    setVerifications(prev => prev.map(v =>
       v.id === id ? { ...v, status: 'approved', adminFeedback: feedback, verifiedAt: new Date().toISOString() } : v
     ));
   }, []);
 
   const handleReject = useCallback((id: string, feedback: string = '') => {
-    setVerifications(prev => prev.map(v => 
+    setVerifications(prev => prev.map(v =>
       v.id === id ? { ...v, status: 'rejected', adminFeedback: feedback, verifiedAt: new Date().toISOString() } : v
     ));
   }, []);
@@ -108,28 +108,28 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden font-sans transition-colors">
-      <Sidebar 
-        lang={lang} 
-        currentView={currentView} 
-        onSetView={setCurrentView} 
+      <Sidebar
+        lang={lang}
+        currentView={currentView}
+        onSetView={setCurrentView}
         pendingCount={pendingCount}
       />
-      
+
       <div className="flex-1 flex flex-col min-w-0">
-        <Header 
-          theme={theme} 
-          onToggleTheme={toggleTheme} 
-          lang={lang} 
+        <Header
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          lang={lang}
           onToggleLang={toggleLang}
           user={user}
           onProfileClick={() => setCurrentView('profile')}
           pendingVerifications={pendingVerifications}
           onNotificationClick={() => setCurrentView('verification')}
         />
-        
+
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            
+
             {currentView === 'dashboard' && (
               <>
                 {/* Welcome Message */}
@@ -142,7 +142,7 @@ const App: React.FC = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <StatsCard 
+                  <StatsCard
                     title={t.need_verification}
                     value={`${pendingCount} ${t.files}`}
                     description={t.immediate_action}
@@ -151,7 +151,7 @@ const App: React.FC = () => {
                     badge={pendingCount > 0 ? { text: t.urgent, type: 'warning' } : undefined}
                     hoverBorder="amber-500"
                   />
-                  <StatsCard 
+                  <StatsCard
                     title={t.total_students}
                     value="1,240"
                     description={t.new_this_month}
@@ -160,7 +160,7 @@ const App: React.FC = () => {
                     badge={{ text: '+12', type: 'success' }}
                     hoverBorder="indigo-600"
                   />
-                  <StatsCard 
+                  <StatsCard
                     title={t.active_jobs}
                     value={`${jobs.filter(j => j.status === 'active').length} ${t.jobs}`}
                     description={t.open_apps}
@@ -168,7 +168,7 @@ const App: React.FC = () => {
                     iconColor="emerald-500"
                     hoverBorder="emerald-500"
                   />
-                  <StatsCard 
+                  <StatsCard
                     title={t.partners}
                     value="24"
                     description={t.active_collab}
@@ -182,7 +182,7 @@ const App: React.FC = () => {
                 {/* Table and Quick Actions Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
-                    <VerificationTable 
+                    <VerificationTable
                       items={verifications.filter(v => v.status === 'pending').slice(0, 5)}
                       onApprove={(id) => handleApprove(id, 'OK')}
                       onReject={(id) => handleReject(id, 'Tidak sesuai')}
@@ -190,7 +190,7 @@ const App: React.FC = () => {
                       lang={lang}
                     />
                     <div className="mt-4 text-center">
-                      <button 
+                      <button
                         onClick={() => setCurrentView('verification')}
                         className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1 w-full"
                       >
@@ -203,7 +203,7 @@ const App: React.FC = () => {
                   <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 h-full transition-colors">
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{t.quick_actions}</h3>
                     <div className="space-y-3">
-                      <button 
+                      <button
                         onClick={() => setCurrentView('jobs')}
                         className="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-500/20 dark:shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all transform hover:-translate-y-0.5 group"
                       >
@@ -217,7 +217,7 @@ const App: React.FC = () => {
                         <span className="material-icons-outlined ml-auto opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
                       </button>
 
-                      <button 
+                      <button
                         onClick={() => setCurrentView('courses')}
                         className="w-full flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all group"
                       >
@@ -249,7 +249,7 @@ const App: React.FC = () => {
             )}
 
             {currentView === 'verification' && (
-              <VerificationPage 
+              <VerificationPage
                 items={verifications}
                 onApprove={handleApprove}
                 onReject={handleReject}
@@ -267,34 +267,34 @@ const App: React.FC = () => {
             )}
 
             {currentView === 'students' && (
-              <StudentsPage 
+              <StudentsPage
                 students={students}
                 lang={lang}
               />
             )}
 
             {currentView === 'jobs' && (
-              <JobsPage 
+              <JobsPage
                 jobs={jobs}
                 lang={lang}
               />
             )}
 
             {currentView === 'stats' && (
-              <StatsPage 
+              <StatsPage
                 jobs={jobs}
                 lang={lang}
               />
             )}
 
             {currentView === 'courses' && (
-              <TrainingPage 
+              <TrainingPage
                 lang={lang}
               />
             )}
 
             {currentView === 'cms' && (
-              <CMSPage 
+              <CMSPage
                 lang={lang}
               />
             )}

@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\VerificationController;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,10 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
+
+Route::get('/inertia-test', function () {
+    return Inertia::render('Test');
+});
 
 Route::get('/', function () {
     return view('welcome');

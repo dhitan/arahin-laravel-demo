@@ -1,6 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
-import React from 'react'; // 👈 BARIS PENTING YANG KURANG
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
