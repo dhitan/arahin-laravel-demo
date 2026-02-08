@@ -63,18 +63,14 @@ class DashboardController extends Controller
             
 
             // Kartu Statistik
+            'pendingVerifications' => $pendingVerifications,
+            'pendingVerificationsCount' => $pendingVerificationsCount,
+
+            // Kartu Statistik
             'pendingCount' => Portfolio::where('status', 'pending')->count(),
             'totalStudents' => Student::count(),
-            'activeJobs' => class_exists(JobVacancy::class) ? JobVacancy::count() : 0,
-            'partnersCount' => 24, // Hardcode
-
-            // 1. Kartu Statistik
-            $data['pendingCount'] = Portfolio::where('status', 'pending')->count();
-            $data['totalStudents'] = Student::count();
-            // Cek apakah tabel/model JobVacancy sudah ada, jika belum gunakan 0 agar tidak error
-            $data['activeJobs'] = class_exists(JobsVacancies::class) ? JobsVacancies::count() : 0; 
-            $data['partnersCount'] = 24; // Hardcode sesuai desain
-
+            'activeJobs' => class_exists(JobsVacancies::class) ? JobsVacancies::count() : 0,
+            'partnersCount' => 24,
 
             // Tabel Recent Requests
             'recentVerifications' => Portfolio::with('student')
