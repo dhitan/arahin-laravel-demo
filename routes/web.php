@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\JobController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +83,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->only(['index', 'show', 'update']);
 
         // Halaman CMS
+        // Route Student
+        Route::resource('students', StudentController::class);
+
+        // Route Jobs
+        Route::resource('jobs', JobController::class);
+            // ->only(['index', 'update', 'store']);
+
+        // --- HALAMAN CMS (MANAJEMEN ADMIN) ---
+        // Route untuk menampilkan halaman list admin & modal tambah admin
+
         Route::get('/cms', [DashboardController::class, 'cms'])->name('cms.index');
 
         // Tambah Admin Baru
