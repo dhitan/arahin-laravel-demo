@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Detail Portfolio') }}
             </h2>
-            <a href="{{ route('dashboard') }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800">
+            <a href="{{ route('home') }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800">
                 &larr; Kembali ke Dashboard
             </a>
         </div>

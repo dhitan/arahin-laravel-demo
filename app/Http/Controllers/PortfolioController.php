@@ -58,7 +58,7 @@ class PortfolioController extends Controller
         $student = DB::table('students')->where('user_id', Auth::id())->first();
 
         if (!$student) {
-            return redirect()->route('dashboard')->with('error', 'Anda harus terdaftar sebagai mahasiswa untuk upload portfolio.');
+            return redirect()->route('home')->with('error', 'Anda harus terdaftar sebagai mahasiswa untuk upload portfolio.');
         }
 
         return view('portfolio.create');
