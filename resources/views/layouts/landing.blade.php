@@ -55,7 +55,7 @@
             <div class="flex items-center gap-4">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="px-6 py-2.5 font-bold text-blue-600 hover:text-blue-700">Dashboard</a>
+                        <a href="{{ route('home') }}" class="px-6 py-2.5 font-bold text-blue-600 hover:text-blue-700">Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="px-6 py-2.5 font-bold text-blue-600 hover:text-blue-700">Masuk</a>
 

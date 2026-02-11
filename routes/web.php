@@ -32,6 +32,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Redirect /dashboard to /home for backwards compatibility
+Route::get('/dashboard', function () {
+    return redirect()->route('home');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 // Route Debugging
 Route::get('/cek-php', function () {
     return [
