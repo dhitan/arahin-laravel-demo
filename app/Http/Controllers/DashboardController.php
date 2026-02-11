@@ -136,9 +136,10 @@ class DashboardController extends Controller
                     'id' => $item->id,
                     'name' => $item->student->full_name ?? 'Mahasiswa',
                     'category' => ucwords(str_replace('_', ' ', $item->category)),
-                    'created_at' => $item->created_at,
+                    'created_at' => $item->created_at->toIso8601String(), // 👈 PENTING: Format datetime ke string
                 ];
-            });
+            })
+            ->toArray(); // 👈 PENTING: Convert ke array untuk Inertia
 
         // 3. Data Khusus Student Dashboard
         $data = [
@@ -198,7 +199,8 @@ class DashboardController extends Controller
                     'status' => $portfolio->status,
                     'admin_feedback' => $portfolio->admin_feedback,
                 ];
-            });
+            })
+            ->toArray(); // 👈 PENTING: Convert ke array untuk Inertia
 
         // Upcoming Activities
         $data['upcomingActivities'] = $student->portfolios()
@@ -216,21 +218,23 @@ class DashboardController extends Controller
                     'location' => ucwords(str_replace('_', ' ', $portfolio->category)),
                     'category' => $portfolio->category,
                 ];
-            });
+            })
+            ->toArray(); // 👈 PENTING: Convert ke array untuk Inertia
 
         // Charts
         $data['chartData'] = $this->getPortfolioChartData($student);
         $data['skillsData'] = $this->getSkillsChartData($student);
 
         // Rekomendasi Course
-        $userInterest = $user->interest; 
+        $userInterest = $user->interest ?? 'Terbaru'; // 👈 PENTING: Default ke 'Terbaru' jika interest kosong
         $recommendedCourses = Course::where('category', $userInterest)
                             ->inRandomOrder()
                             ->limit(3)
-                            ->get();
+                            ->get()
+                            ->toArray(); // 👈 PENTING: Convert ke array untuk Inertia
 
-        if ($recommendedCourses->isEmpty()) {
-            $recommendedCourses = Course::latest()->limit(3)->get();
+        if (empty($recommendedCourses)) {
+            $recommendedCourses = Course::latest()->limit(3)->get()->toArray();
             $userInterest = 'Terbaru';
         }
 
@@ -310,7 +314,7 @@ class DashboardController extends Controller
                 'count' => $count,
             ]);
         }
-        return $months;
+        return $months->toArray(); // 👈 PENTING: Convert ke array untuk Inertia JSON serialization
     }
 
     private function getSkillsChartData($student)
@@ -319,7 +323,7 @@ class DashboardController extends Controller
         $totalSkillsCount = Skill::count();
         $progression = collect([1, 2, 3, 4])->map(function($month) use ($studentSkillsCount) {
             return max(1, $studentSkillsCount - (4 - $month));
-        });
+        })->toArray(); // 👈 PENTING: Convert ke array untuk Inertia JSON serialization
 
         return [
             'current' => $studentSkillsCount,
